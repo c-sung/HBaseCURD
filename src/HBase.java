@@ -7,30 +7,27 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-public class HBase_2 {
-    static Scanner sc = new Scanner(System.in);
-    static int row = 0;
+public class HBase {
+    private static Scanner sc = new Scanner(System.in);
+    private static int row = 0;
 
     public static void main(String[] args) throws IOException {
         {
             System.out.println("Trying to establish HBase connection...");
-            Configuration HBaseConfig = HBaseConfiguration.create();
-            HBaseConfig.set("hbase.zookeeper.quorum", "nqmi26");
+            Configuration hBaseConfig = HBaseConfiguration.create();
+            hBaseConfig.set("hbase.zookeeper.quorum", "nqmi26");
             System.setProperty("hadoop.home.dir", "C:\\winutils\\");
             System.out.println("HBase Connection succeded...");
-            HTable table = new HTable(HBaseConfig, "Member");
+            HTable table = new HTable(hBaseConfig, "Member");
             System.out.println("Please select function");
             String req = sc.next();
             if (req.equals("post")) {
                 table.put(put());
             } else if (req.equals("get")) {
-                ArrayList<Get> getRes = get();
-                getRes.get(0).addColumn(Bytes.toBytes("people"), Bytes.toBytes("name"));
-                getRes.get(1).addColumn(Bytes.toBytes("people"), Bytes.toBytes("age"));
-                getRes.get(2).addColumn(Bytes.toBytes("people"), Bytes.toBytes("sex"));
-                Result resName = table.get(getRes.get(0));
-                Result resAge = table.get(getRes.get(1));
-                Result resSex = table.get(getRes.get(2));
+                Get getIn = get();
+                Result resName = table.get(getIn);
+                Result resAge = table.get(getIn);
+                Result resSex = table.get(getIn);
                 byte[] valN = resName.getValue(Bytes.toBytes("people"), Bytes.toBytes("name"));
                 byte[] valA = resAge.getValue(Bytes.toBytes("people"), Bytes.toBytes("age"));
                 byte[] valS = resSex.getValue(Bytes.toBytes("people"), Bytes.toBytes("sex"));
@@ -58,27 +55,21 @@ public class HBase_2 {
         row += 1;
         Put input = new Put(Bytes.toBytes(String.valueOf(row)));
         System.out.println("Please enter your name");
-        input.add(Bytes.toBytes("people"), Bytes.toBytes("name"), Bytes.toBytes(sc.next()));
+        input.addColumn(Bytes.toBytes("people"), Bytes.toBytes("name"), Bytes.toBytes(sc.next()));
         System.out.println("Please enter your sex");
-        input.add(Bytes.toBytes("people"), Bytes.toBytes("sex"), Bytes.toBytes(sc.next()));
+        input.addColumn(Bytes.toBytes("people"), Bytes.toBytes("sex"), Bytes.toBytes(sc.next()));
         System.out.println("Please enter your age");
-        input.add(Bytes.toBytes("people"), Bytes.toBytes("age"), Bytes.toBytes(sc.next()));
+        input.addColumn(Bytes.toBytes("people"), Bytes.toBytes("age"), Bytes.toBytes(sc.next()));
         return input;
     }
 
-    public static ArrayList<Get> get() {
+    public static Get get() {
         System.out.println("Please enter the rowKey of the data you want to search for.");
         String input = sc.next();
-        Get getName = new Get(Bytes.toBytes((input)));
-        Get getSex = new Get(Bytes.toBytes((input)));
-        Get getAge = new Get(Bytes.toBytes((input)));
-        getName.addColumn(Bytes.toBytes("people"), Bytes.toBytes("name"));
-        getAge.addColumn(Bytes.toBytes("people"), Bytes.toBytes("age"));
-        getSex.addColumn(Bytes.toBytes("people"), Bytes.toBytes("sex"));
-        ArrayList<Get> results = new ArrayList<Get>();
-        results.add(getName);
-        results.add(getAge);
-        results.add(getSex);
-        return results;
+        Get get = new Get(Bytes.toBytes((input)));
+        get.addColumn(Bytes.toBytes("people"), Bytes.toBytes("name"));
+        get.addColumn(Bytes.toBytes("people"), Bytes.toBytes("age"));
+        get.addColumn(Bytes.toBytes("people"), Bytes.toBytes("sex"));
+        return get;
     }
 }
