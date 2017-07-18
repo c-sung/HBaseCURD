@@ -26,11 +26,9 @@ public class HBase {
             } else if (req.equals("get")) {
                 Get getIn = get();
                 Result resName = table.get(getIn);
-                Result resAge = table.get(getIn);
-                Result resSex = table.get(getIn);
                 byte[] valN = resName.getValue(Bytes.toBytes("people"), Bytes.toBytes("name"));
-                byte[] valA = resAge.getValue(Bytes.toBytes("people"), Bytes.toBytes("age"));
-                byte[] valS = resSex.getValue(Bytes.toBytes("people"), Bytes.toBytes("sex"));
+                byte[] valA = resName.getValue(Bytes.toBytes("people"), Bytes.toBytes("age"));
+                byte[] valS = resName.getValue(Bytes.toBytes("people"), Bytes.toBytes("sex"));
                 System.out.println("val:" + Bytes.toString(valN) + "\n" + Bytes.toString(valA) + "\n" + Bytes.toString(valS));
 
             } else if (req.equals("delete")) {
@@ -38,7 +36,7 @@ public class HBase {
                 Delete del = new Delete(Bytes.toBytes(sc.next()));
                 table.delete(del);
                 table.close();
-                System.out.println("OK");
+                System.out.println("OK");s
             } else if (req.equals("put")) {
                 System.out.println("Please enter the rowKey of the data you want to updata.");
                 Put put = new Put(Bytes.toBytes(sc.next()));
